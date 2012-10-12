@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ "live" = "$1" ]; then
+    echo "UPDATE magento_core_configdata SET value='http://%server-name%/' WHERE path='web/unsecure/base_url' LIMIT 1" | mysql -uroot -p%db-pass% magento
+    echo "UPDATE magento_core_configdata SET value='http://%server-name%/' WHERE path='web/secure/base_url' LIMIT 1" | mysql -uroot -p%db-pass% magento
+else
+    echo "UPDATE magento_core_configdata SET value='http://%temp-server-name%/' WHERE path='web/unsecure/base_url' LIMIT 1" | mysql -uroot -p%db-pass% magento
+    echo "UPDATE magento_core_configdata SET value='http://%temp-server-name%/' WHERE path='web/secure/base_url' LIMIT 1" | mysql -uroot -p%db-pass% magento
+fi

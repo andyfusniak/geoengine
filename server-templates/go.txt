@@ -1,0 +1,5 @@
+#!/bin/bash
+scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -C %profile-dir%/{server-setup.sh,magento-url-change,%temp-server-name%,%server-name%} ubuntu@%temp-server-name%:/home/ubuntu
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@%temp-server-name% 'chmod +x server-setup.sh'
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ubuntu@%temp-server-name% '/home/ubuntu/server-setup.sh'

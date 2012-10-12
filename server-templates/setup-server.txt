@@ -1,0 +1,75 @@
+#!/bin/bash
+#export DEBIAN_FRONTEND=noninteractive
+#sudo apt-get -qq update
+#sudo apt-get -qq -y upgrade
+#sudo apt-get install -qq -y apache2
+#sudo apt-get install -qq -y php5
+#sudo apt-get install -qq -y php5-cli
+#sudo apt-get install -qq -y php5-curl
+#sudo apt-get install -qq -y php5-gd
+#sudo apt-get install -qq -y php5-mysql
+#sudo apt-get install -qq -y php5-mcrypt
+
+#sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password password %db-pass%'
+#sudo debconf-set-selections <<< 'mysql-server-5.1 mysql-server/root_password_again password %db-pass%'
+#sudo apt-get -y install mysql-server
+
+sudo mysqladmin -uroot password %db-pass%
+
+cd /home/ubuntu
+chmod u+x magento-url-change
+
+cd /tmp
+wget -q http://www.magentocommerce.com/downloads/assets/1.7.0.2/magento-1.7.0.2.tar.bz2
+tar xjf magento-1.7.0.2.tar.bz2
+
+sudo chown ubuntu:ubuntu /var/www
+sudo rm /var/www/index.html
+sudo mv /tmp/magento /var/www/%domain-name%
+sudo chown ubuntu:ubuntu /var/www/%domain-name%
+sudo chmod 755 /var/www/%domain-name%
+
+cd /var/www/%domain-name%
+chmod -R o+w media var
+chmod o+w app/etc
+
+sudo mv /home/ubuntu/%domain-name% /etc/apache2/sites-available/%domain-name%
+sudo mv /home/ubuntu/%temp-server-name% /etc/apache2/sites-available/%temp-server-name%
+
+sudo a2dissite 000-default
+sudo a2ensite %domain-name%
+sudo a2ensite %temp-server-name%
+
+sudo a2enmod cache
+sudo a2enmod headers
+sudo a2enmod expires
+sudo a2enmod rewrite
+sudo a2enmod ssl
+sudo service apache2 restart
+
+mysqladmin -uroot -p%db-pass% create magento
+
+php -f install.php -- --license_agreement_accepted yes \
+--locale "%locale%" \
+--timezone "%timezone%" \
+--default_currency "%default-currency%" \
+--db_host localhost \
+--db_name magento \
+--db_user root \
+--db_pass "%db-pass%" \
+--db_prefix magento_ \
+--skip_url_validation yes \
+--url "%url%" \
+--secure_base_url "%secure-base-url%" \
+--use_rewrites yes \
+--use_secure no \
+--use_secure_admin no \
+--enable_charts yes \
+--session_save files \
+--admin_frontname "%admin-frontname%" \
+--admin_firstname "%admin-firstname%" \
+--admin_lastname "%admin-lastname%" \
+--admin_email "%admin-email%" \
+--admin_username "%admin-username%" \
+--admin_password "%admin-password%" \
+--encryption_key "%encryption-key%"
